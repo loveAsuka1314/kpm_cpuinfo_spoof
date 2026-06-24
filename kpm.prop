@@ -1,0 +1,7 @@
+id=kpm_cpu_spoof
+name=KPM 动态 CPUInfo 掉包内核模块
+version=1.0
+versionCode=1
+author=Soryu
+description=在内核层精准拦截指定游戏并掉包 /proc/cpuinfo 路径。
+
