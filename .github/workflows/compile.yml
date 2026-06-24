@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout Source Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4  # 顺便升级到最新版拉取组件
 
     - name: Set up Clang & Toolchain
       run: |
@@ -37,8 +37,8 @@ jobs:
         ./kpm-pack -o kpm_cpu_spoof.kpm ./kpm_package
 
     - name: Upload KPM Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # 👈 核心修复：升级到 v4
       with:
         name: kpm_cpu_spoof_module
         path: kpm_cpu_spoof.kpm
-
+        overwrite: true                  # 👈 配合 v4 必须加上的允许覆盖参数
