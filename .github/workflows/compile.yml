@@ -1,0 +1,44 @@
+name: Build K60 Pro KPM Module
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Set up Clang & Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc build-essential libelf-dev libssl-dev clang lld llvm
+
+    - name: Download GKI Kernel Headers (K60 Pro 5.15)
+      run: |
+        git clone https://android.googlesource.com/kernel/common -b android14-5.15 --depth=1 gki-kernel
+        
+    - name: Compile KPM Module
+      run: |
+        make -C gki-kernel M=$PWD ARCH=arm64 LLVM=1 modules
+
+    - name: Prepare KPM Package Directory
+      run: |
+        mkdir -p kpm_package
+        cp cpuinfo_spoof.ko kpm_package/cpuinfo_spoof.ko
+        cp kpm.prop kpm_package/kpm.prop
+
+    - name: Download kpm-pack Tool & Pack to .kpm
+      run: |
+        curl -Lo kpm-pack https://github.com/tiann/KernelSU/releases/latest/download/kpm-pack-linux-amd64
+        chmod +x kpm-pack
+        ./kpm-pack -o kpm_cpu_spoof.kpm ./kpm_package
+
+    - name: Upload KPM Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: kpm_cpu_spoof_module
+        path: kpm_cpu_spoof.kpm
+
